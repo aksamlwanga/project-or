@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+        }
+        .summary {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        .summary p {
+            margin: 0;
+            font-size: 16px;
+        }
+        h2 {
+            color: #444;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .btn {
+            display: block;
+            width: 150px;
+            margin: 20px auto;
+            padding: 12px;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Results</h1>
+        <div class="summary">
+            <p><strong>Status:</strong> {{status}}</p>
+            <p><strong>Method Used:</strong> {{method}}</p>
+            <p><strong>Total Cost:</strong> {{total_cost}}</p>
+            <p><strong>Dummy Info:</strong> {{dummy_info}}</p>
+        </div>
+        <h2>Optimal Shipments</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Route</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for route, amount in results.items() %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{route}}</td>
+                    <td>{{amount}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h2>Constraints Status</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Constraint</th>
+                    <th>Shadow Price</th>
+                    <th>Slack</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for constraint, status in constraints_status.items() %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{constraint}}</td>
+                    <td>{{status[0]}}</td>
+                    <td>{{status[1]}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/" class="btn">Back</a>
+        <button onclick="downloadCSV()" class="btn">Download CSV</button>
+    </div>
+
+    <script>
+        function downloadCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,No.,Route,Amount\n";
+            {% for route, amount in results.items() %}
+            csvContent += "{{loop.index}},{{route}},{{amount}}\n";
+            {% endfor %}
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "optimal_shipments.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
